@@ -4,7 +4,7 @@
 //
 // Node 22+, stdlib only, no network, no environment variables.
 
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 
 const LINE: string =
@@ -30,6 +30,14 @@ function main(): void {
 
   mkdirSync(dirname(OUTPUT_PATH), { recursive: true });
   writeFileSync(OUTPUT_PATH, LINE, "utf8");
+
+  // Read the entry back and confirm exactly what was written: a single
+  // line of 1–199 characters, byte-identical to LINE, with no trailing
+  // newline added by the write.
+  const written = readFileSync(OUTPUT_PATH, "utf8");
+  if (written !== LINE) {
+    throw new Error("entry.txt does not match the entry line after writing");
+  }
 }
 
 main();
